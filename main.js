@@ -1,4 +1,4 @@
-// main.js
+// main.js (updated)
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -41,17 +41,17 @@ class Player {
     if (this.attackAnim > 0) {
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius + 30, 0, Math.PI * 2);
-      ctx.strokeStyle = 'red';
+      ctx.strokeStyle = 'white';
       ctx.lineWidth = 3;
       ctx.stroke();
       this.attackAnim--;
     }
   }
   update() {
-    if (keys['ArrowUp']) this.y -= this.speed;
-    if (keys['ArrowDown']) this.y += this.speed;
-    if (keys['ArrowLeft']) this.x -= this.speed;
-    if (keys['ArrowRight']) this.x += this.speed;
+    if (keys['ArrowUp'] || keys['w']) this.y -= this.speed;
+    if (keys['ArrowDown'] || keys['s']) this.y += this.speed;
+    if (keys['ArrowLeft'] || keys['a']) this.x -= this.speed;
+    if (keys['ArrowRight'] || keys['d']) this.x += this.speed;
     this.draw();
   }
 }
@@ -84,6 +84,14 @@ class Enemy {
     } else {
       this.projectileCooldown--;
     }
+
+    const dx = player.x - this.x;
+    const dy = player.y - this.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < this.radius + player.radius) {
+      player.health -= 0.5;
+    }
+
     this.draw();
   }
 }
@@ -108,6 +116,14 @@ class Projectile {
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     ctx.fillStyle = this.color;
     ctx.fill();
+
+    const dx = player.x - this.x;
+    const dy = player.y - this.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (this.enemy && dist < player.radius) {
+      player.health -= this.damage;
+      this.x = -9999;
+    }
   }
 }
 
@@ -165,6 +181,12 @@ function nextWave() {
 window.addEventListener('keydown', e => keys[e.key] = true);
 window.addEventListener('keyup', e => keys[e.key] = false);
 attackBtn.addEventListener('click', attack);
+rerollBtn.addEventListener('click', () => {
+  if (gold >= 20) {
+    gold -= 20;
+    showShop();
+  }
+});
 
 function startGame() {
   player = new Player();
