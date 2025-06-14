@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Endless Combat Game</title>
+  <style>
+    html, body {
+      margin: 0;
+      overflow: hidden;
+      background: #111;
+      touch-action: none;
+    }
+    canvas {
+      display: block;
+      background: #222;
+    }
+    #ui {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-family: sans-serif;
+      font-size: 16px;
+      z-index: 10;
+    }
+    #attackBtn, #restartBtn {
+      position: absolute;
+      bottom: 20px;
+      padding: 20px;
+      border-radius: 50%;
+      background: white;
+      color: red;
+      font-size: 16px;
+      border: 3px solid red;
+      z-index: 10;
+    }
+    #attackBtn {
+      right: 20px;
+    }
+    #restartBtn {
+      left: 20px;
+      display: none;
+      background: #4CAF50;
+      color: white;
+      border: none;
+    }
+    #attackBtn.cooldown {
+      opacity: 0.5;
+    }
+    #shop {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #333;
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      display: none;
+      z-index: 20;
+      width: 300px;
+    }
+    #shop button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+    }
+    #stats {
+      margin-top: 20px;
+      background: #222;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .upgrade-slot {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="ui">
+    HP: <span id="hp">100</span> |
+    Gold: <span id="gold">0</span> |
+    Wave: <span id="wave">1</span>
+  </div>
+  <button id="attackBtn">⚔️</button>
+  <button id="restartBtn" onclick="location.reload()">Restart</button>
+
+  <div id="shop">
+    <h3>Shop</h3>
+    <div id="upgradeSlots"></div>
+    <button id="rerollBtn">Reroll (??g)</button>
+    <br><br>
+    <button onclick="nextWave()">Start Next Wave</button>
+    <div id="stats"></div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
