@@ -27,27 +27,47 @@
       z-index: 10;
     }
 
-    #attackBtn, #restartBtn {
+    #attackBtn {
       position: absolute;
       bottom: 20px;
       right: 20px;
       padding: 20px;
       border-radius: 50%;
-      background: red;
-      color: white;
-      font-size: 16px;
-      border: none;
+      background: white;
+      color: #d00;
+      font-size: 24px;
+      border: 4px solid #d00;
       z-index: 10;
-      transition: background 0.3s ease;
+      transition: background 0.3s, color 0.3s, border 0.3s;
+      box-shadow: 0 0 12px #fff6, 0 0 24px #f002;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
     #attackBtn.cooldown {
-      background: #770000;
+      background: #eee;
+      color: #ff8888;
+      border-color: #990000;
+      animation: btncd 1s linear;
+    }
+    @keyframes btncd {
+      0% { filter: brightness(1.2); }
+      100% { filter: brightness(1); }
     }
 
     #restartBtn {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      padding: 20px 30px;
+      border-radius: 16px;
       background: #4CAF50;
+      color: white;
+      font-size: 20px;
+      border: none;
+      z-index: 10;
       display: none;
+      box-shadow: 0 0 10px #222a;
     }
 
     #shop {
@@ -57,40 +77,152 @@
       transform: translate(-50%, -50%);
       background: #333;
       color: white;
-      padding: 20px;
-      border-radius: 10px;
+      padding: 20px 30px 20px 210px;
+      border-radius: 12px;
       display: none;
       z-index: 20;
+      min-width: 400px;
+      min-height: 220px;
+      box-shadow: 0 0 28px #000a;
     }
 
-    #shop button {
-      margin-top: 10px;
-      padding: 10px;
+    #shopUpgrades {
+      display: flex;
+      flex-direction: row;
+      gap: 18px;
+      margin-bottom: 18px;
+      justify-content: center;
+    }
+
+    .shop-upg {
+      background: #242;
+      border-radius: 10px;
+      padding: 12px 10px 9px 10px;
+      color: #fff;
+      min-width: 120px;
+      box-shadow: 0 0 10px #0006;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .shop-upg-cost {
+      color: #ffd700;
+      font-weight: 700;
+      font-size: 16px;
+      margin-top: 4px;
+      margin-bottom: 1px;
+    }
+
+    .shop-upg-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .shop-upg-desc {
+      font-size: 13px;
+      margin-bottom: 5px;
+      text-align: center;
+      min-height: 36px;
+    }
+
+    .shop-upg button {
+      margin-top: 4px;
+      padding: 6px 0;
+      width: 90%;
+      border-radius: 7px;
+      background: #fff2;
+      border: 1px solid #888;
+      color: #fff;
+      font-size: 15px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .shop-upg button:disabled {
+      background: #3335;
+      color: #ccc;
+    }
+
+    #rerollBtn {
+      background: #2a2a55;
+      color: #ffe066;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      margin: 10px 0 0 0;
+      cursor: pointer;
+      font-size: 18px;
+      box-shadow: 0 0 8px #0004;
+    }
+    #rerollBtn:disabled {
+      background: #444;
+      color: #999;
+    }
+
+    #shopStats {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      width: 170px;
+      background: #242;
+      border-radius: 10px;
+      color: #fff;
+      padding: 15px 8px 15px 15px;
+      font-size: 15px;
+      box-shadow: 0 0 10px #0008;
+      z-index: 1;
+    }
+    #shopStats h4 {
+      margin: 0 0 7px 0;
+      font-size: 16px;
+      color: #ffd700;
+      text-align: left;
+    }
+    #shopStats ul {
+      margin: 0; padding: 0 0 0 14px;
+      list-style: disc;
+      font-size: 15px;
+    }
+    #shopStats li {
+      margin-bottom: 4px;
+    }
+
+    #shop .shop-next {
+      margin-top: 20px;
       width: 100%;
+      color: #fff;
+      background: #388e3c;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      padding: 8px 0;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 0 5px #0004;
     }
   </style>
 </head>
 <body>
   <canvas id="game"></canvas>
   <div id="ui">
-    HP: <span id="hp">100</span> |
+    HP: <span id="hp">100</span> /
+    <span id="maxhp">100</span> |
     Gold: <span id="gold">0</span> |
     Wave: <span id="wave">1</span>
   </div>
-  <button id="attackBtn">⚔️</button>
+  <button id="attackBtn"><svg width="26" height="26" style="display:block" viewBox="0 0 26 26"><path d="M5 23L23 5M15 5h8v8" stroke="#d00" stroke-width="3" stroke-linecap="round"/></svg></button>
   <button id="restartBtn" onclick="location.reload()">Restart</button>
-
   <div id="shop">
+    <div id="shopStats"></div>
     <h3>Shop</h3>
-    <p>Upgrade stats using gold!</p>
-    <button onclick="buyUpgrade('hp')">+20 Max HP (10g)</button>
-    <button onclick="buyUpgrade('dmg')">+1 Damage (10g)</button>
-    <button onclick="buyUpgrade('spd')">+0.5 Speed (10g)</button>
-    <br><br>
-    <button onclick="nextWave()">Start Next Wave</button>
+    <p>Pick an upgrade or reroll!</p>
+    <div id="shopUpgrades"></div>
+    <button id="rerollBtn"></button>
+    <button class="shop-next" onclick="nextWave()">Start Next Wave</button>
   </div>
-
   <script>
+    // Core Variables
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
     canvas.width = innerWidth;
@@ -100,28 +232,247 @@
     let dmg = 5, speed = 3;
     let attackCooldown = false;
     let attackAnim = 0;
-
-    let player = { x: canvas.width / 2, y: canvas.height / 2, r: 20 };
-    let enemies = [], medkits = [];
+    let player = { x: canvas.width / 2, y: canvas.height / 2, r: 20, color: "lime" };
+    let enemies = [], medkits = [], enemyProjectiles = [];
     let touchTarget = { x: player.x, y: player.y };
     let inShop = false;
+    let upgradeSlots = [];
+    let rerollCost = 0;
+    let abilities = { melee: { has: true, lvl: 1 }, lifesteal: { has: false, lvl: 0, pct: 0 }, projectiles: { has: false, lvl: 0, num: 0, dmg: 0 }, energy: { has: false, lvl: 0, dmg: 0 }, lightning: { has: false, lvl: 0, dmg: 0, radius: 0 } };
+    let attackBtn = document.getElementById("attackBtn");
+    let restartBtn = document.getElementById("restartBtn");
+    let shopEl = document.getElementById("shop");
+    let shopUpgsEl = document.getElementById("shopUpgrades");
+    let shopStatsEl = document.getElementById("shopStats");
+    let rerollBtn = document.getElementById("rerollBtn");
+    let hpEl = document.getElementById("hp");
+    let maxhpEl = document.getElementById("maxhp");
+    let goldEl = document.getElementById("gold");
+    let waveEl = document.getElementById("wave");
 
-    const hpEl = document.getElementById("hp");
-    const goldEl = document.getElementById("gold");
-    const waveEl = document.getElementById("wave");
-    const shopEl = document.getElementById("shop");
-    const restartBtn = document.getElementById("restartBtn");
-    const attackBtn = document.getElementById("attackBtn");
+    // Upgrade weights and abilities
+    const UPGRADE_CLASSES = [
+      { name: "Health", weight: 5, key: "health" },
+      { name: "Speed", weight: 5, key: "speed" },
+      { name: "New Ability", weight: 2, key: "newAbility" },
+      { name: "Upgrade Ability", weight: 4, key: "upAbility" }
+    ];
+    const ABILITIES = [
+      { key: "lifesteal", name: "Life Steal", weight: 2, desc: "Heal on hit" },
+      { key: "projectiles", name: "Projectiles", weight: 3, desc: "Shoot projectiles" },
+      { key: "energy", name: "Energy Ring", weight: 2, desc: "Ring damage" },
+      { key: "lightning", name: "Lightning", weight: 1, desc: "Chain hit" }
+    ];
 
+    // Utility for weighted random
+    function weightedRandom(arr, excludeKeys=[]) {
+      let pool = arr.filter(x => !excludeKeys.includes(x.key));
+      let sum = pool.reduce((s, x) => s + x.weight, 0);
+      let r = Math.random() * sum, acc = 0;
+      for (const obj of pool) {
+        acc += obj.weight;
+        if (r < acc) return obj;
+      }
+      return pool[pool.length-1];
+    }
+    function randRange(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+    function randFloat(a, b) { return Math.round((Math.random() * (b - a) + a)*100)/100; }
+    function cap(val, min, max) { return Math.max(min, Math.min(val, max)); }
+
+    function randomUpgradeSlot() {
+      let upgClass = weightedRandom(UPGRADE_CLASSES);
+      let slot = { class: upgClass.key, title: "", desc: "", btn: "", cost: randRange(5, 12), act: null };
+      if (upgClass.key === "health") {
+        if (Math.random() < 0.5) {
+          // Heal
+          let heal = randRange(10, 30);
+          slot.title = `Heal +${heal} HP`;
+          slot.desc = `Restore ${heal} HP.`;
+          slot.act = () => { hp = cap(hp + heal, 0, maxHp); };
+        } else {
+          // Max HP
+          let m = randRange(10, 30);
+          slot.title = `Max HP +${m}`;
+          slot.desc = `Increase max HP by ${m}.`;
+          slot.act = () => { maxHp += m; maxhpEl.textContent = maxHp; };
+        }
+      } else if (upgClass.key === "speed") {
+        let inc = randFloat(0.2, 0.8);
+        slot.title = `Speed +${inc}`;
+        slot.desc = `Increase movement speed by ${inc}.`;
+        slot.act = () => { speed += inc; };
+      } else if (upgClass.key === "newAbility") {
+        // Choose random non-owned ability
+        let exclude = Object.keys(abilities).filter(k => abilities[k].has);
+        if (exclude.length === ABILITIES.length) {
+          // fallback, can't pick new ability, pick health upg
+          return randomUpgradeSlot();
+        }
+        let ab = weightedRandom(ABILITIES, exclude);
+        let abInfo = ab;
+        slot.title = `Gain Ability: ${abInfo.name}`;
+        slot.desc = abInfo.desc;
+        slot.act = () => {
+          abilities[abInfo.key].has = true;
+          abilities[abInfo.key].lvl = 1;
+          if (abInfo.key === "lifesteal") abilities.lifesteal.pct = 10;
+          if (abInfo.key === "projectiles") { abilities.projectiles.num = 3; abilities.projectiles.dmg = 3; }
+          if (abInfo.key === "energy") abilities.energy.dmg = 1;
+          if (abInfo.key === "lightning") { abilities.lightning.dmg = 2; abilities.lightning.radius = 10; }
+        };
+      } else if (upgClass.key === "upAbility") {
+        let owned = Object.keys(abilities).filter(k => abilities[k].has && (k !== "melee" || abilities[k].lvl < 20));
+        if (owned.length === 0) return randomUpgradeSlot();
+        let abKey = owned[Math.floor(Math.random()*owned.length)];
+        let ab = abilities[abKey];
+        slot.title = `Upgrade: ${abKey[0].toUpperCase()+abKey.slice(1)}`;
+        if (abKey === "melee") {
+          if (Math.random() < 0.5 && ab.lvl < 20) {
+            // Damage
+            let inc = randRange(1, 2);
+            slot.title = `Melee Damage +${inc}`;
+            slot.desc = `Increase melee damage by ${inc}.`;
+            slot.act = () => { dmg += inc; ab.lvl = cap(ab.lvl + 1, 1, 20); };
+          } else {
+            let inc = randRange(1, 2);
+            slot.title = `Melee Radius +${inc}`;
+            slot.desc = `Increase melee radius by ${inc} (max 20).`;
+            slot.act = () => { player.r = cap(player.r + inc, 20, 40); ab.lvl = cap(ab.lvl + 1, 1, 20); };
+          }
+        } else if (abKey === "lifesteal") {
+          let pct = Math.min(75, ab.pct + 2);
+          slot.title = `Lifesteal +2% (to ${pct}%)`;
+          slot.desc = `Lifesteal increases from ${ab.pct}% to ${pct}%.`;
+          slot.act = () => { ab.pct = pct; ab.lvl++; };
+        } else if (abKey === "projectiles") {
+          if (ab.num < 8 && Math.random() < 0.5) {
+            slot.title = `Projectile +1`;
+            slot.desc = `Shoot one more projectile (now ${ab.num+1}, max 8).`;
+            slot.act = () => { ab.num = cap(ab.num+1, 3, 8); ab.lvl++; };
+          } else {
+            let inc = randRange(1, 2);
+            slot.title = `Projectile Damage +${inc}`;
+            slot.desc = `Projectiles deal +${inc} damage (now ${ab.dmg+inc}).`;
+            slot.act = () => { ab.dmg += inc; ab.lvl++; };
+          }
+        } else if (abKey === "energy") {
+          slot.title = `Energy Ring +1 Damage`;
+          slot.desc = `Energy ring deals +1 damage each tick (now ${ab.dmg+1}).`;
+          slot.act = () => { ab.dmg += 1; ab.lvl++; };
+        } else if (abKey === "lightning") {
+          if (ab.radius < 15 && Math.random() < 0.5) {
+            slot.title = `Lightning Radius +1`;
+            slot.desc = `Lightning effect radius increases to ${ab.radius+1} (max 15).`;
+            slot.act = () => { ab.radius = cap(ab.radius+1, 10, 15); ab.lvl++; };
+          } else {
+            let inc = randRange(1, 2);
+            slot.title = `Lightning Damage +${inc}`;
+            slot.desc = `Lightning deals +${inc} damage (now ${ab.dmg+inc}).`;
+            slot.act = () => { ab.dmg += inc; ab.lvl++; };
+          }
+        }
+      }
+      slot.btn = `Buy (${slot.cost}g)`;
+      return slot;
+    }
+
+    function rerollUpgrades() {
+      rerollCost = randRange(15, 25);
+      upgradeSlots = [randomUpgradeSlot(), randomUpgradeSlot(), randomUpgradeSlot()];
+      renderShopUpgrades();
+    }
+
+    function renderShopUpgrades() {
+      shopUpgsEl.innerHTML = "";
+      upgradeSlots.forEach((slot, i) => {
+        let el = document.createElement("div");
+        el.className = "shop-upg";
+        el.innerHTML =
+          `<div class="shop-upg-title">${slot.title}</div>
+           <div class="shop-upg-desc">${slot.desc}</div>
+           <div class="shop-upg-cost">💰 ${slot.cost}</div>
+           <button ${gold<slot.cost?'disabled':''} onclick="buyUpgrade(${i})">${slot.btn}</button>`;
+        shopUpgsEl.appendChild(el);
+      });
+      rerollBtn.textContent = `Reroll (${rerollCost}g)`;
+      rerollBtn.disabled = gold < rerollCost;
+      renderShopStats();
+    }
+
+    window.buyUpgrade = function(idx) {
+      let slot = upgradeSlots[idx];
+      if (gold < slot.cost) return;
+      gold -= slot.cost;
+      goldEl.textContent = gold;
+      slot.act();
+      closeShop();
+    };
+
+    rerollBtn.onclick = function() {
+      if (gold < rerollCost) return;
+      gold -= rerollCost;
+      goldEl.textContent = gold;
+      rerollUpgrades();
+    };
+
+    function renderShopStats() {
+      let html = `<h4>Your Stats</h4><ul>
+        <li>HP: ${hp}/${maxHp}</li>
+        <li>Gold: ${gold}</li>
+        <li>Damage: ${dmg}</li>
+        <li>Speed: ${speed.toFixed(2)}</li>
+        <li>Melee Radius: ${player.r}</li>`;
+      if (abilities.lifesteal.has) html += `<li>Life Steal: ${abilities.lifesteal.pct}%</li>`;
+      if (abilities.projectiles.has) html += `<li>Projectiles: ${abilities.projectiles.num} × ${abilities.projectiles.dmg}</li>`;
+      if (abilities.energy.has) html += `<li>Energy Ring: ${abilities.energy.dmg}/sec</li>`;
+      if (abilities.lightning.has) html += `<li>Lightning: ${abilities.lightning.dmg}, r=${abilities.lightning.radius}</li>`;
+      html += `</ul>`;
+      shopStatsEl.innerHTML = html;
+    }
+
+    function openShop() {
+      rerollUpgrades();
+      shopEl.style.display = "block";
+      inShop = true;
+      renderShopStats();
+    }
+    function closeShop() {
+      shopEl.style.display = "none";
+      inShop = false;
+    }
+    function nextWave() {
+      wave++;
+      waveEl.textContent = wave;
+      spawnEnemies();
+      closeShop();
+    }
+
+    // Enemy spawning
     function spawnEnemies() {
-      let count = Math.min(3 + wave, 20);
+      let count = Math.min(4 + wave, 24);
+      let avgHp = 10 + wave * 3;
+      enemies = [];
+      let bossIdx = (wave%3===0) ? randRange(0, count-1) : -1;
       for (let i = 0; i < count; i++) {
-        let r = 12 + Math.random() * 10;
-        let speed = 1 + Math.random();
-        let eHp = 10 + wave * 2;
-        let x = Math.random() * canvas.width;
-        let y = Math.random() < 0.5 ? 0 : canvas.height;
-        enemies.push({ x, y, r, hp: eHp, speed });
+        let r = bossIdx === i ? 32 : 12 + Math.random() * 10;
+        let hpVal = Math.round(avgHp * (0.7 + Math.random()*0.6));
+        if (bossIdx === i) hpVal *= 3;
+        let speed = bossIdx === i ? 0.7 + Math.random()*0.5 : 1 + Math.random();
+        let canShoot = Math.random() < (bossIdx===i ? 1 : 0.2+0.01*wave);
+        let eProjDmg = bossIdx === i ? Math.ceil(hpVal/3) : 3+Math.floor(wave/1);
+        let spawnEdge = Math.random();
+        let x, y;
+        if (spawnEdge < 0.25) { x = 0; y = Math.random()*canvas.height; }
+        else if (spawnEdge < 0.5) { x = canvas.width; y = Math.random()*canvas.height; }
+        else if (spawnEdge < 0.75) { x = Math.random()*canvas.width; y = 0; }
+        else { x = Math.random()*canvas.width; y = canvas.height; }
+        enemies.push({
+          x, y, r, hp: hpVal, maxHp: hpVal, speed, canShoot, projDmg: eProjDmg,
+          cooldown: Math.random()*2 + 2,
+          boss: bossIdx === i,
+          color: bossIdx === i ? "#f6b914" : "#c23",
+          vx: 0, vy: 0
+        });
       }
     }
 
@@ -131,58 +482,89 @@
       medkits.push({ x, y, r: 15 });
     }
 
-    function openShop() {
-      shopEl.style.display = "block";
-      inShop = true;
-    }
+    // Player input
+    canvas.addEventListener("touchmove", e => {
+      if (inShop) return;
+      let t = e.touches[0];
+      touchTarget = { x: t.clientX, y: t.clientY };
+    });
 
-    function nextWave() {
-      wave++;
-      waveEl.textContent = wave;
-      if (wave % 2 === 0) spawnMedkit();
-      spawnEnemies();
-      shopEl.style.display = "none";
-      inShop = false;
-    }
-
-    function buyUpgrade(type) {
-      if (gold < 10) return;
-      gold -= 10;
-      goldEl.textContent = gold;
-      if (type === 'hp') maxHp += 20;
-      if (type === 'dmg') dmg += 1;
-      if (type === 'spd') speed += 0.5;
-    }
+    // Attack and abilities
+    let projectiles = [];
+    let energyRingAnim = 0, energyRingTimer = 0;
 
     function attack() {
       if (attackCooldown || inShop) return;
       attackCooldown = true;
       attackAnim = 1;
-
       attackBtn.classList.add("cooldown");
       setTimeout(() => {
         attackCooldown = false;
         attackBtn.classList.remove("cooldown");
       }, 1000);
 
+      // MELEE (starter ability)
+      let meleeRadius = player.r + 40;
+      let meleeHit = false;
       for (let i = enemies.length - 1; i >= 0; i--) {
         let e = enemies[i];
-        let dx = player.x - e.x;
-        let dy = player.y - e.y;
-        let dist = Math.hypot(dx, dy);
-        if (dist < player.r + 40) {
-          e.hp -= dmg;
+        let dx = player.x - e.x, dy = player.y - e.y, dist = Math.hypot(dx, dy);
+        if (dist < meleeRadius + e.r) {
+          let dmgDealt = dmg;
+          e.hp -= dmgDealt;
+          meleeHit = true;
+          // LIFESTEAL
+          if (abilities.lifesteal.has && dmgDealt > 0) {
+            let heal = Math.round(dmgDealt * abilities.lifesteal.pct / 100);
+            if (heal > 0) { hp = cap(hp + heal, 0, maxHp); }
+          }
+          // LIGHTNING
+          if (abilities.lightning.has) {
+            for (let j = 0; j < enemies.length; j++) {
+              if (i === j) continue;
+              let e2 = enemies[j];
+              let d2 = Math.hypot(e2.x-e.x, e2.y-e.y);
+              if (d2 < abilities.lightning.radius + e2.r) {
+                e2.hp -= abilities.lightning.dmg;
+                spawnLightningEffect(e.x, e.y, e2.x, e2.y, abilities.lightning.dmg);
+              }
+            }
+          }
           if (e.hp <= 0) {
-            enemies.splice(i, 1);
             gold += 5;
             goldEl.textContent = gold;
+            enemies.splice(i, 1);
           }
         }
       }
-    }
 
+      // PROJECTILES
+      if (abilities.projectiles.has) {
+        let n = abilities.projectiles.num;
+        let spread = Math.PI/3;
+        let baseAngle = Math.atan2(touchTarget.y-player.y, touchTarget.x-player.x) || 0;
+        for (let i = 0; i < n; i++) {
+          let ang = baseAngle - spread/2 + spread * i/(n-1||1);
+          projectiles.push({
+            x: player.x, y: player.y,
+            vx: Math.cos(ang)*7,
+            vy: Math.sin(ang)*7,
+            r: 8, dmg: abilities.projectiles.dmg,
+            color: "#fff",
+            hit: false
+          });
+        }
+      }
+    }
     attackBtn.addEventListener("click", attack);
 
+    // Visual effects
+    let lightningFX = [];
+    function spawnLightningEffect(x1, y1, x2, y2, dmg) {
+      lightningFX.push({x1, y1, x2, y2, t: 12, dmg});
+    }
+
+    // Game update loop
     function movePlayer() {
       let dx = touchTarget.x - player.x;
       let dy = touchTarget.y - player.y;
@@ -193,50 +575,203 @@
       }
     }
 
-    canvas.addEventListener("touchmove", e => {
-      if (inShop) return;
-      let t = e.touches[0];
-      touchTarget = { x: t.clientX, y: t.clientY };
-    });
-
     function update() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Energy Ring tick
+      if (abilities.energy.has) {
+        if (performance.now() - energyRingTimer > 1000) {
+          energyRingTimer = performance.now();
+          for (let i = enemies.length-1; i >= 0; i--) {
+            let e = enemies[i];
+            let dist = Math.hypot(e.x-player.x, e.y-player.y);
+            if (dist < player.r + 70 + e.r) {
+              e.hp -= abilities.energy.dmg;
+              if (e.hp <= 0) {
+                gold += 5;
+                goldEl.textContent = gold;
+                enemies.splice(i, 1);
+              }
+            }
+          }
+        }
+        energyRingAnim += 0.08;
+      }
+
       movePlayer();
 
       // Attack animation
       if (attackAnim > 0) {
         ctx.beginPath();
         ctx.arc(player.x, player.y, player.r + 40 * attackAnim, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255,255,255,${attackAnim})`;
+        ctx.strokeStyle = `rgba(255,0,0,${attackAnim})`;
         ctx.lineWidth = 5;
         ctx.stroke();
         attackAnim -= 0.1;
       }
 
       // Draw player
+      ctx.save();
       ctx.beginPath();
       ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
-      ctx.fillStyle = "lime";
+      ctx.fillStyle = player.color;
+      ctx.shadowColor = "#fff";
+      ctx.shadowBlur = 10;
       ctx.fill();
+      ctx.restore();
+
+      // Energy ring
+      if (abilities.energy.has) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(player.x, player.y, player.r+70, 0, 2*Math.PI);
+        ctx.strokeStyle = `rgba(0,255,255,0.5)`;
+        ctx.lineWidth = 4 + 1.5*Math.sin(energyRingAnim);
+        ctx.setLineDash([8, 16]);
+        ctx.shadowColor = "#0ff";
+        ctx.shadowBlur = 12;
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+
+      // Player stats update
+      hpEl.textContent = hp;
+      maxhpEl.textContent = maxHp;
+
+      // Projectiles
+      for (let i = projectiles.length-1; i >= 0; i--) {
+        let p = projectiles[i];
+        p.x += p.vx; p.y += p.vy;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, 2*Math.PI);
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = "#fff";
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        // Collisions
+        for (let j = enemies.length-1; j >= 0; j--) {
+          let e = enemies[j];
+          let dist = Math.hypot(e.x-p.x, e.y-p.y);
+          if (dist < e.r+p.r) {
+            e.hp -= p.dmg;
+            // LIFESTEAL
+            if (abilities.lifesteal.has && p.dmg > 0) {
+              let heal = Math.round(p.dmg * abilities.lifesteal.pct / 100);
+              if (heal > 0) { hp = cap(hp + heal, 0, maxHp); }
+            }
+            // LIGHTNING
+            if (abilities.lightning.has) {
+              for (let k = 0; k < enemies.length; k++) {
+                if (k === j) continue;
+                let e2 = enemies[k];
+                let d2 = Math.hypot(e2.x-e.x, e2.y-e.y);
+                if (d2 < abilities.lightning.radius + e2.r) {
+                  e2.hp -= abilities.lightning.dmg;
+                  spawnLightningEffect(e.x, e.y, e2.x, e2.y, abilities.lightning.dmg);
+                }
+              }
+            }
+            if (e.hp <= 0) {
+              gold += 5;
+              goldEl.textContent = gold;
+              enemies.splice(j, 1);
+            }
+            projectiles.splice(i, 1);
+            break;
+          }
+        }
+        // Remove if out of bounds
+        if (p.x < 0||p.x>canvas.width||p.y<0||p.y>canvas.height) projectiles.splice(i, 1);
+      }
+
+      // Draw lightning effects
+      for (let i = lightningFX.length-1; i >= 0; i--) {
+        let fx = lightningFX[i];
+        ctx.save();
+        ctx.strokeStyle = `rgba(255,255,0,${fx.t/12})`;
+        ctx.lineWidth = 3+2*Math.random();
+        ctx.beginPath();
+        ctx.moveTo(fx.x1, fx.y1);
+        ctx.lineTo((fx.x1+fx.x2)/2+Math.random()*8-4, (fx.y1+fx.y2)/2+Math.random()*8-4);
+        ctx.lineTo(fx.x2, fx.y2);
+        ctx.stroke();
+        ctx.restore();
+        fx.t--;
+        if (fx.t <= 0) lightningFX.splice(i, 1);
+      }
 
       // Enemies
       for (let i = enemies.length - 1; i >= 0; i--) {
         let e = enemies[i];
-        let dx = player.x - e.x;
-        let dy = player.y - e.y;
-        let dist = Math.hypot(dx, dy);
-        e.x += (dx / dist) * e.speed;
-        e.y += (dy / dist) * e.speed;
-
+        // Movement
+        let dx = player.x - e.x, dy = player.y - e.y, dist = Math.hypot(dx, dy);
+        let spd = e.boss ? e.speed * 0.7 : e.speed;
+        e.x += (dx / dist) * spd;
+        e.y += (dy / dist) * spd;
+        // Draw
+        ctx.save();
         ctx.beginPath();
-        ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
-        ctx.fillStyle = "red";
+        ctx.arc(e.x, e.y, e.r, 0, 2*Math.PI);
+        ctx.fillStyle = e.color;
+        ctx.shadowColor = e.boss ? "#ffd700" : "#c23";
+        ctx.shadowBlur = e.boss ? 15 : 6;
         ctx.fill();
+        ctx.shadowBlur = 0;
+        // Health bar
+        ctx.fillStyle = "#fff4";
+        ctx.fillRect(e.x-e.r, e.y-e.r-8, e.r*2, 5);
+        ctx.fillStyle = "#f33";
+        ctx.fillRect(e.x-e.r, e.y-e.r-8, e.r*2 * (e.hp/e.maxHp), 5);
+        // Boss aura
+        if (e.boss) {
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.r+6, 0, 2*Math.PI);
+          ctx.strokeStyle = "#ffd70088";
+          ctx.lineWidth = 6;
+          ctx.stroke();
+        }
+        ctx.restore();
 
+        // Enemy attacks player
         if (dist < player.r + e.r) {
           hp -= 1;
-          hpEl.textContent = hp;
         }
+
+        // Enemy shooting
+        e.cooldown -= 1/60;
+        if (e.canShoot && e.cooldown < 0) {
+          e.cooldown = (e.boss ? 1.1 : 2.2)+Math.random();
+          let ang = Math.atan2(player.y-e.y, player.x-e.x) + (Math.random()-0.5)*0.15;
+          enemyProjectiles.push({
+            x: e.x, y: e.y,
+            vx: Math.cos(ang)*4.2, vy: Math.sin(ang)*4.2,
+            r: e.boss?15:9,
+            dmg: e.projDmg,
+            color: "#f33"
+          });
+        }
+      }
+
+      // Enemy projectiles
+      for (let i = enemyProjectiles.length-1; i>=0; i--) {
+        let p = enemyProjectiles[i];
+        p.x += p.vx; p.y += p.vy;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, 2*Math.PI);
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = "#f33";
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        // Hit player
+        if (Math.hypot(player.x-p.x, player.y-p.y)<player.r+p.r) {
+          hp -= p.dmg;
+          enemyProjectiles.splice(i,1);
+          continue;
+        }
+        if (p.x<0||p.x>canvas.width||p.y<0||p.y>canvas.height) enemyProjectiles.splice(i,1);
       }
 
       // Medkits
@@ -246,7 +781,22 @@
         ctx.beginPath();
         ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
         ctx.fillStyle = "cyan";
+        ctx.shadowColor = "#0ff";
+        ctx.shadowBlur = 10;
         ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        // cross
+        ctx.save();
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(m.x-4, m.y); ctx.lineTo(m.x+4, m.y);
+        ctx.moveTo(m.x, m.y-4); ctx.lineTo(m.x, m.y+4);
+        ctx.stroke();
+        ctx.restore();
         if (dist < player.r + m.r) {
           hp = Math.min(maxHp, hp + 30);
           hpEl.textContent = hp;
@@ -256,6 +806,7 @@
 
       // Check wave complete
       if (enemies.length === 0 && !inShop) {
+        spawnMedkit();
         openShop();
       }
 
@@ -268,8 +819,15 @@
       requestAnimationFrame(update);
     }
 
+    // Initial
     spawnEnemies();
     update();
+
+    // Resize
+    window.addEventListener('resize', () => {
+      canvas.width = innerWidth;
+      canvas.height = innerHeight;
+    });
   </script>
 </body>
 </html>
