@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Endless Combat Game</title>
+  <title>Endless Arena</title>
   <style>
     html, body {
       margin: 0;
@@ -11,10 +11,12 @@
       background: #111;
       touch-action: none;
     }
+
     canvas {
       display: block;
       background: #222;
     }
+
     #ui {
       position: absolute;
       top: 10px;
@@ -24,30 +26,30 @@
       font-size: 16px;
       z-index: 10;
     }
+
     #attackBtn, #restartBtn {
       position: absolute;
       bottom: 20px;
+      right: 20px;
       padding: 20px;
       border-radius: 50%;
-      background: white;
-      color: red;
-      font-size: 16px;
-      border: 3px solid red;
-      z-index: 10;
-    }
-    #attackBtn {
-      right: 20px;
-    }
-    #restartBtn {
-      left: 20px;
-      display: none;
-      background: #4CAF50;
+      background: red;
       color: white;
+      font-size: 16px;
       border: none;
+      z-index: 10;
+      transition: background 0.3s ease;
     }
+
     #attackBtn.cooldown {
-      opacity: 0.5;
+      background: #770000;
     }
+
+    #restartBtn {
+      background: #4CAF50;
+      display: none;
+    }
+
     #shop {
       position: absolute;
       top: 50%;
@@ -59,21 +61,12 @@
       border-radius: 10px;
       display: none;
       z-index: 20;
-      width: 300px;
     }
+
     #shop button {
       margin-top: 10px;
       padding: 10px;
       width: 100%;
-    }
-    #stats {
-      margin-top: 20px;
-      background: #222;
-      padding: 10px;
-      border-radius: 8px;
-    }
-    .upgrade-slot {
-      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -89,15 +82,194 @@
 
   <div id="shop">
     <h3>Shop</h3>
-    <div id="upgradeSlots"></div>
-    <button id="rerollBtn">Reroll (??g)</button>
+    <p>Upgrade stats using gold!</p>
+    <button onclick="buyUpgrade('hp')">+20 Max HP (10g)</button>
+    <button onclick="buyUpgrade('dmg')">+1 Damage (10g)</button>
+    <button onclick="buyUpgrade('spd')">+0.5 Speed (10g)</button>
     <br><br>
     <button onclick="nextWave()">Start Next Wave</button>
-    <div id="stats"></div>
   </div>
 
-  <script src="shop.js"></script>
-  <script src="main.js"></script>
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
 
+    let hp = 100, maxHp = 100, gold = 0, wave = 1;
+    let dmg = 5, speed = 3;
+    let attackCooldown = false;
+    let attackAnim = 0;
+
+    let player = { x: canvas.width / 2, y: canvas.height / 2, r: 20 };
+    let enemies = [], medkits = [];
+    let touchTarget = { x: player.x, y: player.y };
+    let inShop = false;
+
+    const hpEl = document.getElementById("hp");
+    const goldEl = document.getElementById("gold");
+    const waveEl = document.getElementById("wave");
+    const shopEl = document.getElementById("shop");
+    const restartBtn = document.getElementById("restartBtn");
+    const attackBtn = document.getElementById("attackBtn");
+
+    function spawnEnemies() {
+      let count = Math.min(3 + wave, 20);
+      for (let i = 0; i < count; i++) {
+        let r = 12 + Math.random() * 10;
+        let speed = 1 + Math.random();
+        let eHp = 10 + wave * 2;
+        let x = Math.random() * canvas.width;
+        let y = Math.random() < 0.5 ? 0 : canvas.height;
+        enemies.push({ x, y, r, hp: eHp, speed });
+      }
+    }
+
+    function spawnMedkit() {
+      let x = Math.random() * (canvas.width - 30) + 15;
+      let y = Math.random() * (canvas.height - 30) + 15;
+      medkits.push({ x, y, r: 15 });
+    }
+
+    function openShop() {
+      shopEl.style.display = "block";
+      inShop = true;
+    }
+
+    function nextWave() {
+      wave++;
+      waveEl.textContent = wave;
+      if (wave % 2 === 0) spawnMedkit();
+      spawnEnemies();
+      shopEl.style.display = "none";
+      inShop = false;
+    }
+
+    function buyUpgrade(type) {
+      if (gold < 10) return;
+      gold -= 10;
+      goldEl.textContent = gold;
+      if (type === 'hp') maxHp += 20;
+      if (type === 'dmg') dmg += 1;
+      if (type === 'spd') speed += 0.5;
+    }
+
+    function attack() {
+      if (attackCooldown || inShop) return;
+      attackCooldown = true;
+      attackAnim = 1;
+
+      attackBtn.classList.add("cooldown");
+      setTimeout(() => {
+        attackCooldown = false;
+        attackBtn.classList.remove("cooldown");
+      }, 1000);
+
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        let e = enemies[i];
+        let dx = player.x - e.x;
+        let dy = player.y - e.y;
+        let dist = Math.hypot(dx, dy);
+        if (dist < player.r + 40) {
+          e.hp -= dmg;
+          if (e.hp <= 0) {
+            enemies.splice(i, 1);
+            gold += 5;
+            goldEl.textContent = gold;
+          }
+        }
+      }
+    }
+
+    attackBtn.addEventListener("click", attack);
+
+    function movePlayer() {
+      let dx = touchTarget.x - player.x;
+      let dy = touchTarget.y - player.y;
+      let dist = Math.hypot(dx, dy);
+      if (dist > 1) {
+        player.x += (dx / dist) * speed;
+        player.y += (dy / dist) * speed;
+      }
+    }
+
+    canvas.addEventListener("touchmove", e => {
+      if (inShop) return;
+      let t = e.touches[0];
+      touchTarget = { x: t.clientX, y: t.clientY };
+    });
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      movePlayer();
+
+      // Attack animation
+      if (attackAnim > 0) {
+        ctx.beginPath();
+        ctx.arc(player.x, player.y, player.r + 40 * attackAnim, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(255,255,255,${attackAnim})`;
+        ctx.lineWidth = 5;
+        ctx.stroke();
+        attackAnim -= 0.1;
+      }
+
+      // Draw player
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
+      ctx.fillStyle = "lime";
+      ctx.fill();
+
+      // Enemies
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        let e = enemies[i];
+        let dx = player.x - e.x;
+        let dy = player.y - e.y;
+        let dist = Math.hypot(dx, dy);
+        e.x += (dx / dist) * e.speed;
+        e.y += (dy / dist) * e.speed;
+
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+        ctx.fillStyle = "red";
+        ctx.fill();
+
+        if (dist < player.r + e.r) {
+          hp -= 1;
+          hpEl.textContent = hp;
+        }
+      }
+
+      // Medkits
+      for (let i = medkits.length - 1; i >= 0; i--) {
+        let m = medkits[i];
+        let dist = Math.hypot(player.x - m.x, player.y - m.y);
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+        ctx.fillStyle = "cyan";
+        ctx.fill();
+        if (dist < player.r + m.r) {
+          hp = Math.min(maxHp, hp + 30);
+          hpEl.textContent = hp;
+          medkits.splice(i, 1);
+        }
+      }
+
+      // Check wave complete
+      if (enemies.length === 0 && !inShop) {
+        openShop();
+      }
+
+      // Game over
+      if (hp <= 0) {
+        restartBtn.style.display = "block";
+        return;
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    spawnEnemies();
+    update();
+  </script>
 </body>
 </html>
